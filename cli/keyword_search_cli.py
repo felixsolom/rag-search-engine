@@ -29,7 +29,9 @@ def get_query(data: dict, query: str) -> list[str]:
     matched_items = []
     for movie in data.get("movies", []):
         title = movie.get("title", "")
-        if query in title:
+        title_lower = str(title).lower()
+        query = query.lower()
+        if query in title_lower:
             matched_items.append(title)
             if len(matched_items) >= DEFAULT_SEARCH_LIMIT:
                 break
