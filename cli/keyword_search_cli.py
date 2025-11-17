@@ -2,6 +2,7 @@
 
 import argparse
 from search_utils import DEFAULT_SEARCH_LIMIT, load_movies
+import string
 
 
 def main() -> None:
@@ -29,13 +30,17 @@ def get_query(data: dict, query: str) -> list[str]:
     matched_items = []
     for movie in data.get("movies", []):
         title = movie.get("title", "")
-        title_lower = str(title).lower()
-        query = query.lower()
-        if query in title_lower:
+        preprocessed_title = preprocess_text(str(title))
+        preprocessed_query = preprocess_text(query)
+        if preprocessed_query in preprocessed_title:
             matched_items.append(title)
             if len(matched_items) >= DEFAULT_SEARCH_LIMIT:
                 break
     return matched_items
+
+
+def preprocess_text(text: str) -> str:
+    return text.lower().translate(str.maketrans("", "", string.punctuation))
 
 
 if __name__ == "__main__":
