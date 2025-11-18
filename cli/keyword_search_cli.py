@@ -30,17 +30,36 @@ def get_query(data: dict, query: str) -> list[str]:
     matched_items = []
     for movie in data.get("movies", []):
         title = movie.get("title", "")
-        preprocessed_title = preprocess_text(str(title))
-        preprocessed_query = preprocess_text(query)
-        if preprocessed_query in preprocessed_title:
+        tokenized_query = tokenize_text(str(title))
+        tokenized_title = tokenize_text(query)
+        if has_matching_token(tokenized_query, tokenized_title):
             matched_items.append(title)
             if len(matched_items) >= DEFAULT_SEARCH_LIMIT:
                 break
     return matched_items
 
 
+def has_matching_token(query_tokens: list[str], title_tokens: list[str]) -> bool:
+    for query_token in query_tokens:
+        for title_token in title_tokens:
+            if query_token in title_token:
+                return True
+    return False
+
+
 def preprocess_text(text: str) -> str:
     return text.lower().translate(str.maketrans("", "", string.punctuation))
+
+
+def tokenize_text(text: str) -> list[str]:
+    text = preprocess_text(text)
+    tokenized_text = text.split(" ")
+    all_tokens = []
+    for token in tokenized_text:
+        if not token.isalnum():
+            continue
+        all_tokens.append(token)
+    return all_tokens
 
 
 if __name__ == "__main__":
